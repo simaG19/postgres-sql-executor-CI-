@@ -1,37 +1,30 @@
 pipeline {
     agent any
 
-    /************************************************************************
-     * 1. PARAMETERS:                                                      *
-     *    - CLIENT     : Short client code to identify which "hostname"     *
-     *    - DB_NAME    : Name of the database on that host (with default)   *
-     *    - SQL_COMMAND: Multi-line text area for SQL (SELECT/DELETE/UPDATE)*
-     ************************************************************************/
     parameters {
-        // CLIENT: e.g. "hhco", "hhil", "hhva", "hhmd"
+        // 1) CLIENT: short code to identify which hostname to use (e.g., "hhco", "hhil", etc.)
         string(
-            name: 'CLIENT', 
-            defaultValue: '', 
+            name: 'CLIENT',
+            defaultValue: '',
             description: 'Enter the client code (e.g., hhco, hhil, hhva, hhmd).'
         )
 
-        // DB_NAME: name of the database on that host; you can override if needed.
+        // 2) DB_NAME: the name of the PostgreSQL database on that host (default is a placeholder)
         string(
-            name: 'DB_NAME', 
-            defaultValue: 'default_db', 
+            name: 'DB_NAME',
+            defaultValue: 'default_db',
             description: 'Enter the target PostgreSQL database name (e.g., hhco_orders).'
         )
 
-        // SQL_COMMAND: multi-line text area, supports SELECT, DELETE, and UPDATE only.
+        // 3) SQL_COMMAND: a multi-line text area for user‐supplied SQL (SELECT, DELETE, UPDATE only)
         text(
-            name: 'SQL_COMMAND', 
-            defaultValue: '', 
+            name: 'SQL_COMMAND',
+            defaultValue: '',
             description: '''\
-Paste your multi-line SQL (only SELECT, DELETE, or UPDATE statements). 
-e.g.:
-DELETE FROM users
-WHERE active = false;
-'''.stripIndent()
+            Paste your multi-line SQL here (only SELECT, DELETE, or UPDATE statements). For example:
+            DELETE FROM users
+            WHERE active = false;
+            '''
         )
     }
 
@@ -65,7 +58,7 @@ WHERE active = false;
                     def targetHost = "${client}.db.${branchName}.corvesta.net"
                     echo "→ Mapped branch '${branchName}' + client '${client}' → target host: ${targetHost}"
 
-                    // ---- 5) Save for later stages (so we don’t have to recompute) ----
+                    // ---- 5) Save for later stages ----
                     env.TARGET_HOST = targetHost
                     env.CLIENT = client
                     env.DB_NAME = dbName
@@ -83,8 +76,8 @@ WHERE active = false;
             }
         }
 
-        // (Later: Step 3 will add stages for Security Checks, Safety Count, Execution, etc.)
+        // (Future: Step 3 will add stages for Security Checks, Count Check, and SQL execution.)
     }
 
-    // (We’ll fill in 'post' blocks in a later step to handle success/failure.)
+    // (Future: Add 'post { success { … } failure { … } }' blocks in Step 4.)
 }
